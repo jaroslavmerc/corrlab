@@ -1,0 +1,2122 @@
+classdef corrlab < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        CorrLABv10UIFigure            matlab.ui.Figure
+        CorrLABv10Label               matlab.ui.control.Label
+        AnalysisSettingsPanel         matlab.ui.container.Panel
+        AnalysisTypeButtonGroup       matlab.ui.container.ButtonGroup
+        CorrelationAnalysisButton     matlab.ui.control.RadioButton
+        PeriodAnalysisButton          matlab.ui.control.RadioButton
+        CorrelationMethodButtonGroup  matlab.ui.container.ButtonGroup
+        ClassicCorrelationButton      matlab.ui.control.RadioButton
+        SelfCorrelationButton         matlab.ui.control.RadioButton
+        DiscreteCorrelationButton     matlab.ui.control.RadioButton
+        MaximalShiftValuePanel        matlab.ui.container.Panel
+        ValueEditFieldLabel           matlab.ui.control.Label
+        ValueEditField                matlab.ui.control.NumericEditField
+        InterpolationPanel            matlab.ui.container.Panel
+        ResolutionEditFieldLabel      matlab.ui.control.Label
+        ResolutionEditField           matlab.ui.control.NumericEditField
+        MethodButtonGroup             matlab.ui.container.ButtonGroup
+        pchipButton                   matlab.ui.control.RadioButton
+        splineButton                  matlab.ui.control.RadioButton
+        linearButton                  matlab.ui.control.RadioButton
+        BinningSettingsPanel          matlab.ui.container.Panel
+        BinSizeEditFieldLabel         matlab.ui.control.Label
+        BinSizeEditField              matlab.ui.control.NumericEditField
+        MedianBoxEditFieldLabel       matlab.ui.control.Label
+        MedianBoxEditField            matlab.ui.control.NumericEditField
+        Dataset1Panel                 matlab.ui.container.Panel
+        UIAxes                        matlab.ui.control.UIAxes
+        LoadButton                    matlab.ui.control.Button
+        CropOptionsPanel              matlab.ui.container.Panel
+        MaxEditFieldLabel             matlab.ui.control.Label
+        MaxEditField                  matlab.ui.control.NumericEditField
+        MinEditFieldLabel             matlab.ui.control.Label
+        MinEditField                  matlab.ui.control.NumericEditField
+        CropButton                    matlab.ui.control.Button
+        ReversedYAxisCheckBox         matlab.ui.control.CheckBox
+        FastPeriodAnalysisButton      matlab.ui.control.Button
+        GButton                       matlab.ui.control.Button
+        Dataset2Panel                 matlab.ui.container.Panel
+        UIAxes_2                      matlab.ui.control.UIAxes
+        LoadButton_2                  matlab.ui.control.Button
+        CropOptionsPanel_2            matlab.ui.container.Panel
+        MaxEditField_2Label           matlab.ui.control.Label
+        MaxEditField_2                matlab.ui.control.NumericEditField
+        MinEditField_2Label           matlab.ui.control.Label
+        MinEditField_2                matlab.ui.control.NumericEditField
+        CropButton_2                  matlab.ui.control.Button
+        SameLimitsCheckBox            matlab.ui.control.CheckBox
+        ReversedYAxisCheckBox_2       matlab.ui.control.CheckBox
+        FastPeriodAnalysisButton_2    matlab.ui.control.Button
+        ResultsPanel                  matlab.ui.container.Panel
+        UIAxes_3                      matlab.ui.control.UIAxes
+        UIAxes_4                      matlab.ui.control.UIAxes
+        UIAxes_5                      matlab.ui.control.UIAxes
+        ZeroLagCoefficientEditFieldLabel  matlab.ui.control.Label
+        ZeroLagCoefficientEditField   matlab.ui.control.NumericEditField
+        ShowPeaksButton               matlab.ui.control.StateButton
+        ShowMinimasButton             matlab.ui.control.StateButton
+        ShiftEditFieldLabel           matlab.ui.control.Label
+        ShiftEditField                matlab.ui.control.NumericEditField
+        CoefLabel                     matlab.ui.control.Label
+        CoefEditField                 matlab.ui.control.NumericEditField
+        ShiftEditField_2Label         matlab.ui.control.Label
+        ShiftEditFieldneg             matlab.ui.control.NumericEditField
+        CoefLabel_2                   matlab.ui.control.Label
+        CoefEditFieldneg              matlab.ui.control.NumericEditField
+        MaximalPositiveLabel          matlab.ui.control.Label
+        MaximalNegativeLabel          matlab.ui.control.Label
+        CorrelationLabel              matlab.ui.control.Label
+        CorrelationLabel_2            matlab.ui.control.Label
+        TableofPeriodsPanel           matlab.ui.container.Panel
+        UITable                       matlab.ui.control.Table
+        NegativeCorrelationMinimasPanel  matlab.ui.container.Panel
+        UITable_2                     matlab.ui.control.Table
+        limittoCheckBox               matlab.ui.control.CheckBox
+        EditField                     matlab.ui.control.NumericEditField
+        limittoCheckBox_2             matlab.ui.control.CheckBox
+        EditField_2                   matlab.ui.control.NumericEditField
+        OwnShiftEditFieldLabel        matlab.ui.control.Label
+        OwnShiftEditField             matlab.ui.control.NumericEditField
+        CoefLabel_3                   matlab.ui.control.Label
+        PlotButton                    matlab.ui.control.Button
+        StatusTextAreaLabel           matlab.ui.control.Label
+        StatusTextArea                matlab.ui.control.TextArea
+        PerformAnalysisButton         matlab.ui.control.Button
+        SaveResultsButton             matlab.ui.control.Button
+        SaveFiguresButton             matlab.ui.control.Button
+        RestartButton                 matlab.ui.control.Button
+        Lamp                          matlab.ui.control.Lamp
+        Copyright2017JaroslavMercAllRightsReservedLabel  matlab.ui.control.Label
+        automaticallyCheckBox         matlab.ui.control.CheckBox
+        Version10April2017Label       matlab.ui.control.Label
+        Button_2                      matlab.ui.control.Button
+    end
+
+
+    methods (Access = public)
+    
+        function datanew=gamaver(app, data)
+%GAMAVER Function makes averages of data rows based on resolutions.
+            data=sortrows(data,1);
+            datanew = [];
+            i=1;
+            while i<=length(data)
+                j=1;
+                newrow=data(i,:);
+                while ((i+j)<=length(data))&&((data(i+j,1)-data(i,1))==0)
+                    newrow=newrow+data(i+j,:);
+                    j=j+1;
+                end
+                newrow=newrow/j;
+                datanew=[datanew; newrow];
+                i=i+j;
+            end
+         end
+        
+    end
+
+    methods (Access = private)
+    
+        function turnon(app,color)
+            global donotturnoff;
+            donotturnoff = 0;
+            if color == 'orange'
+            app.Lamp.Color = [0.96,0.64,0.38];
+            elseif color == 'green '
+            app.Lamp.Color = [0.20,0.80,0.20];
+            elseif color == 'red   '
+            app.Lamp.Color = [1.00,0.00,0.00];
+            donotturnoff = 1;
+            end
+            app.Lamp.Enable = 'on';
+        end
+        
+        function turnoff(app)
+            global donotturnoff;
+            if donotturnoff == 0
+            app.Lamp.Color = [1.00,1.00,1.00];
+            app.Lamp.Enable = 'off'; 
+            end
+        end
+        
+    end
+
+
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startfunc(app)
+            app.UIAxes.Visible = 'off';
+            app.UIAxes_2.Visible = 'off';
+            global NumberData method tablecount changed performed loaded1 loaded2;
+            NumberData = 2;
+            method = 1;
+            changed = 0;
+            tablecount = 1;
+            performed = 0;
+            loaded1 = 0;
+            loaded2 = 0;
+            app.StatusTextArea.Value = 'Application started.';
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            app.GButton.Visible = 'off';
+        end
+
+        % Selection changed function: AnalysisTypeButtonGroup
+        function analysistype(app, event)
+            selectedButton = app.AnalysisTypeButtonGroup.SelectedObject;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            global NumberData method loaded1 loaded2;
+            if selectedButton == app.CorrelationAnalysisButton
+                turnon(app,'green ');
+                app.Dataset2Panel.Visible = 'on';
+            %                 app.FastPeriodAnalysisButton.Visible = 'on';
+            %                 app.FastPeriodAnalysisButton_2.Visible = 'on';
+                app.MaximalShiftValuePanel.Title = 'Maximal Shift Value';
+                app.ValueEditField.Enable = 'on';
+                app.ClassicCorrelationButton.Enable = 'on';
+                app.SelfCorrelationButton.Enable = 'off';
+                app.DiscreteCorrelationButton.Enable = 'off';
+                set(findall(app.InterpolationPanel, '-property', 'enable'), 'enable', 'on');
+                set(findall(app.BinningSettingsPanel, '-property', 'enable'), 'enable', 'off');
+                app.CorrelationMethodButtonGroup.SelectedObject = app.ClassicCorrelationButton;
+                app.Dataset1Panel.Title = 'Dataset 1';
+                NumberData = 2;
+                method = 1;
+                if loaded2 == 1
+                    app.PerformAnalysisButton.Enable = 'on';
+                    app.PerformAnalysisButton.BackgroundColor =[0.839 0.91 0.851];
+                    app.automaticallyCheckBox.Enable = 'on';
+                else
+                    app.PerformAnalysisButton.Enable = 'off';
+                    app.automaticallyCheckBox.Enable = 'off';
+                end
+                app.StatusTextArea.Value = vertcat('Selected: Correlation Analysis', app.StatusTextArea.Value);
+                pause(0.001);
+                turnoff(app);
+            elseif selectedButton == app.PeriodAnalysisButton
+                turnon(app,'green ');
+                app.Dataset2Panel.Visible = 'off';
+                app.FastPeriodAnalysisButton.Visible = 'off';
+                app.FastPeriodAnalysisButton_2.Visible = 'off';
+                app.MaximalShiftValuePanel.Title = 'Maximal Period Value';
+                app.ValueEditField.Enable = 'on';
+                app.ClassicCorrelationButton.Enable = 'on';
+                app.SelfCorrelationButton.Enable = 'on';
+                app.DiscreteCorrelationButton.Enable = 'on';
+                set(findall(app.InterpolationPanel, '-property', 'enable'), 'enable', 'on');
+                set(findall(app.BinningSettingsPanel, '-property', 'enable'), 'enable', 'off');
+                app.CorrelationMethodButtonGroup.SelectedObject = app.ClassicCorrelationButton;
+                app.Dataset1Panel.Title = 'Dataset';
+                NumberData = 1;
+                method = 1;
+                if loaded1 == 1
+                    app.PerformAnalysisButton.Enable = 'on';
+                    app.PerformAnalysisButton.BackgroundColor =[0.839 0.91 0.851];
+                    app.automaticallyCheckBox.Enable = 'on';
+                else
+                    app.PerformAnalysisButton.Enable = 'off';
+                    app.automaticallyCheckBox.Enable = 'off';
+                end
+                app.StatusTextArea.Value = vertcat('Selected: Period Analysis', app.StatusTextArea.Value);
+                pause(0.001);
+                turnoff(app);
+            end
+        end
+
+        % Button pushed function: RestartButton
+        function restart(app, event)
+            delete(app);
+            app = corrlab();
+        end
+
+        % Button pushed function: LoadButton
+        function load1(app, event)
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            clear data1 loaded1 data1_temp
+            global data1 data2 NumberData loaded1 datapath1 dataname1 changed datapath2 dataname2;
+            if changed == 1
+                turnon(app,'green ');
+                data1 = gamaver(app, data2);
+                datapath1 = datapath2;
+                dataname1 = dataname2;
+                changed = 0;
+            else
+                turnon(app,'orange');
+                app.StatusTextArea.Value = vertcat('Waiting for data ...', app.StatusTextArea.Value);  
+                [dataname1, datapath1] = uigetfile('*.dat','Select dataset file');
+                if (isequal(dataname1,0) || isequal(datapath1,0))
+                    turnon(app,'red   ');
+                    app.StatusTextArea.Value = vertcat('File not loaded.', app.StatusTextArea.Value); 
+                    loaded1 = 0;
+                    return
+                else
+                    data1 = load(fullfile(datapath1,dataname1));
+                    data1 = gamaver(app, data1);
+                    loaded1 = 1;
+                end
+            end
+            turnon(app,'green '); 
+            
+            if NumberData==1
+                app.PerformAnalysisButton.Enable = 'on';
+                app.automaticallyCheckBox.Enable = 'on';
+                app.PerformAnalysisButton.BackgroundColor =[0.839 0.91 0.851];
+            end
+            
+            plot(app.UIAxes,data1(:,1),data1(:,2));
+            set(app.UIAxes,'xlim',[data1(1,1) data1(end,1)]);
+            
+            if app.ReversedYAxisCheckBox.Value == true
+                set(app.UIAxes,'Ydir','reverse');
+            else
+                set(app.UIAxes,'Ydir','normal'); 
+            end
+            
+            app.UIAxes.Visible = 'on';
+            set(findall(app.CropOptionsPanel, '-property', 'enable'), 'enable', 'on');
+            title(app.UIAxes,dataname1, 'interpreter', 'none')
+            app.LoadButton_2.Enable = 'on';
+            app.ReversedYAxisCheckBox.Enable = 'on';
+            app.FastPeriodAnalysisButton.Enable = 'on';
+            
+            pause(0.001);
+            temp = strcat('File ',{' '},dataname1,{' '},'loaded successfully.');
+            app.StatusTextArea.Value = vertcat(temp, app.StatusTextArea.Value); 
+            turnoff(app);
+        end
+
+        % Value changed function: ReversedYAxisCheckBox
+        function reverseyaxis1(app, event)
+            if app.ReversedYAxisCheckBox.Value == true
+                set(app.UIAxes,'Ydir','reverse');
+            else
+                set(app.UIAxes,'Ydir','normal'); 
+            end
+        end
+
+        % Button pushed function: LoadButton_2
+        function load2(app, event)
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            clear data2 loaded2 dataname2 datapath2
+            global data2 loaded2 dataname2 datapath2;
+            turnon(app,'orange');
+            app.StatusTextArea.Value = vertcat('Waiting for data ...', app.StatusTextArea.Value);  
+            [dataname2, datapath2] = uigetfile('*.dat','Select dataset file');
+            
+            if (isequal(dataname2,0) || isequal(datapath2,0))
+                turnon(app,'red   ');
+                app.StatusTextArea.Value = vertcat('File not loaded.', app.StatusTextArea.Value); 
+                loaded2 = 0;
+                return
+            else
+                data2 = load(fullfile(datapath2,dataname2));
+                data2 = gamaver(app, data2);
+                loaded2 = 1;
+            end
+            
+            turnon(app,'green ');
+                              
+            plot(app.UIAxes_2,data2(:,1),data2(:,2),'color',[1 .5 0.2])
+            set(app.UIAxes_2,'xlim',[data2(1,1) data2(end,1)]);
+            
+            if app.ReversedYAxisCheckBox_2.Value == true
+                set(app.UIAxes_2,'Ydir','reverse');
+            else
+                set(app.UIAxes_2,'Ydir','normal'); 
+            end
+            
+            app.UIAxes_2.Visible = 'on';
+            set(findall(app.CropOptionsPanel_2, '-property', 'enable'), 'enable', 'on');
+            title(app.UIAxes_2,dataname2, 'interpreter', 'none')
+            app.ReversedYAxisCheckBox_2.Enable = 'on';
+             
+            if app.SameLimitsCheckBox.Value == true
+                app.MaxEditField_2.Enable = 'off';
+                app.MinEditField_2.Enable = 'off';
+            end
+            
+            app.PerformAnalysisButton.Enable = 'on';
+            app.automaticallyCheckBox.Enable = 'on';
+            app.PerformAnalysisButton.BackgroundColor =[0.839 0.91 0.851];
+            app.FastPeriodAnalysisButton_2.Enable = 'on';
+            
+            pause(0.001);
+            temp = strcat('File ',{' '},dataname2,{' '},'loaded successfully.');
+            app.StatusTextArea.Value = vertcat(temp, app.StatusTextArea.Value); 
+            turnoff(app);
+        end
+
+        % Value changed function: ReversedYAxisCheckBox_2
+        function reverseyaxis2(app, event)
+            if app.ReversedYAxisCheckBox_2.Value == true
+                set(app.UIAxes_2,'Ydir','reverse');
+            else
+                set(app.UIAxes_2,'Ydir','normal'); 
+            end
+        end
+
+        % Value changed function: SameLimitsCheckBox
+        function samelimits(app, event)
+            if app.SameLimitsCheckBox.Value == true
+                app.MaxEditField_2.Enable = 'off';
+                app.MinEditField_2.Enable = 'off';
+                app.MaxEditField_2.Value = app.MaxEditField.Value;
+                app.MinEditField_2.Value = app.MinEditField.Value;
+            else
+                app.MaxEditField_2.Enable = 'on';
+                app.MinEditField_2.Enable = 'on'; 
+                app.MaxEditField_2.Value = Inf;
+                app.MinEditField_2.Value = 0;
+            end
+        end
+
+        % Button pushed function: CropButton
+        function crop1(app, event)
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            global data1 datapath1 dataname1;
+            turnon(app,'green ');
+            app.MaxEditField.FontColor = [0 0 0];
+            app.MinEditField.FontColor = [0 0 0];
+            noleftclip = 0;
+            norightclip = 0;
+            
+            leftclip = app.MinEditField.Value;
+            rightclip = app.MaxEditField.Value;
+            
+            data1=load(fullfile(datapath1,dataname1));
+            data1=gamaver(app, data1);
+            
+            if rightclip<leftclip
+                smaller=rightclip;
+                bigger=leftclip;
+                rightclip=bigger;
+                leftclip=smaller;
+                app.MinEditField.Value = leftclip;
+                app.MaxEditField.Value = rightclip;
+                app.MaxEditField.FontColor = [1 0 0];
+                app.MinEditField.FontColor = [1 0 0];
+                turnon(app,'red   ');
+                app.StatusTextArea.Value = vertcat('Warning: Limits have been changed.', app.StatusTextArea.Value);
+            end
+            
+            if app.MinEditField.Value < data1(1,1)
+                leftclip = data1(1,1);
+                noleftclip = 1;
+            end
+            
+            if app.MaxEditField.Value > data1(end,1)
+                rightclip = data1(end,1);
+                norightclip = 1;
+            end
+            
+            data1=data1(data1(:,1)<=rightclip & data1(:,1)>=leftclip,:);
+            
+            plot(app.UIAxes,data1(:,1),data1(:,2));
+            set(app.UIAxes,'xlim',[data1(1,1) data1(end,1)]);
+            
+            if app.ReversedYAxisCheckBox.Value == true
+                set(app.UIAxes,'Ydir','reverse');
+            else
+                set(app.UIAxes,'Ydir','normal'); 
+            end
+            
+            if noleftclip == 1 && norightclip == 1
+                title(app.UIAxes,dataname1, 'interpreter', 'none');
+                temp = strcat('File ',{' '},dataname1,{' '},'not cropped.');
+            else
+                title(app.UIAxes,strcat('cropped_',dataname1), 'interpreter', 'none'); 
+                temp = strcat('File ',{' '},dataname1,{' '},'cropped.');
+            end
+            
+            app.StatusTextArea.Value = vertcat(temp, app.StatusTextArea.Value);
+            pause(0.001);
+            turnoff(app);
+        end
+
+        % Button pushed function: CropButton_2
+        function crop2(app, event)
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            global data2 datapath2 dataname2;
+            turnon(app,'green ');
+            app.MaxEditField_2.FontColor = [0 0 0];
+            app.MinEditField_2.FontColor = [0 0 0];
+            noleftclip = 0;
+            norightclip = 0;
+            
+            leftclip = app.MinEditField_2.Value;
+            rightclip = app.MaxEditField_2.Value;
+            
+            data2=load(fullfile(datapath2,dataname2));
+            data2=gamaver(app, data2);
+            
+            if rightclip<leftclip
+                smaller=rightclip;
+                bigger=leftclip;
+                rightclip=bigger;
+                leftclip=smaller;
+                app.MinEditField_2.Value = leftclip;
+                app.MaxEditField_2.Value = rightclip;
+                app.MaxEditField_2.FontColor = [1 0 0];
+                app.MinEditField_2.FontColor = [1 0 0];
+            end
+            
+            if app.MinEditField_2.Value < data2(1,1)
+                leftclip = data2(1,1);
+                noleftclip = 1;
+            end
+            
+            if app.MaxEditField_2.Value > data2(end,1)
+                rightclip = data2(end,1);
+                norightclip = 1;
+            end
+            
+            data2=data2(data2(:,1)<=rightclip & data2(:,1)>=leftclip,:);
+            
+            plot(app.UIAxes_2,data2(:,1),data2(:,2),'color',[1 .5 0.2]);
+            set(app.UIAxes_2,'xlim',[data2(1,1) data2(end,1)]);
+            
+            if app.ReversedYAxisCheckBox_2.Value == true
+                set(app.UIAxes_2,'Ydir','reverse');
+            else
+                set(app.UIAxes_2,'Ydir','normal'); 
+            end
+            
+            if noleftclip == 1 && norightclip == 1
+                title(app.UIAxes_2,dataname2, 'interpreter', 'none');
+                temp = strcat('File ',{' '},dataname2,{' '},'not cropped.');
+            else
+                title(app.UIAxes_2,strcat('cropped_',dataname2), 'interpreter', 'none');
+                temp = strcat('File ',{' '},dataname2,{' '},'cropped.');
+            end
+            
+            app.StatusTextArea.Value = vertcat(temp, app.StatusTextArea.Value);
+            pause(0.001);
+            turnoff(app);
+        end
+
+        % Selection changed function: CorrelationMethodButtonGroup
+        function analysismethod(app, event)
+            selectedButton = app.CorrelationMethodButtonGroup.SelectedObject;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            global method;
+            if selectedButton == app.ClassicCorrelationButton
+                turnon(app,'green ');
+                app.LoadButton.Enable = 'on';
+                set(findall(app.InterpolationPanel, '-property', 'enable'), 'enable', 'on');
+                set(findall(app.BinningSettingsPanel, '-property', 'enable'), 'enable', 'off');
+                method = 1;
+                app.StatusTextArea.Value = vertcat('Selected Method: Classic Correlation', app.StatusTextArea.Value);
+                pause(0.001);
+                turnoff(app);
+            elseif selectedButton == app.SelfCorrelationButton
+                turnon(app,'green ');
+                app.LoadButton.Enable = 'on';
+                set(findall(app.InterpolationPanel, '-property', 'enable'), 'enable', 'off');
+                set(findall(app.BinningSettingsPanel, '-property', 'enable'), 'enable', 'on');
+                method = 2;
+                app.StatusTextArea.Value = vertcat('Selected Method: Self-Correlation', app.StatusTextArea.Value);
+                pause(0.001);
+                turnoff(app);
+            elseif selectedButton == app.DiscreteCorrelationButton
+                turnon(app,'green ');
+                app.LoadButton.Enable = 'on';
+                set(findall(app.InterpolationPanel, '-property', 'enable'), 'enable', 'off');
+                set(findall(app.BinningSettingsPanel, '-property', 'enable'), 'enable', 'on');
+                method = 3;
+                app.StatusTextArea.Value = vertcat('Selected Method: Discrete Correlation', app.StatusTextArea.Value);
+                pause(0.001);
+                turnoff(app);
+            end
+            
+        end
+
+        % Button pushed function: SaveResultsButton
+        function saveresults(app, event)
+            global r peaks minimas NumberData;
+            
+            [filename, path]=uiputfile({'*.*', 'Data file (*.dat)'},'Save final data files as');
+            
+            filenamecorr=[filename,'.dat'];
+            save(fullfile(path,filenamecorr),'r','-ascii','-double');
+            filenamepeaks=[filename,'_peaks.dat'];
+            save(fullfile(path,filenamepeaks),'peaks','-ascii','-double');
+            
+            if NumberData == 2
+            filenameminimas=[filename,'_minimas.dat'];
+            save(fullfile(path,filenameminimas),'minimas','-ascii','-double');
+            end
+        end
+
+        % Button pushed function: PerformAnalysisButton
+        function performanalysis(app, event)
+            clearvars -global -except NumberData method data1 data2 interpolationmethod maxperiod datapath1 datapath2 dataname1 dataname2 tablecount loaded1 loaded2;
+            global NumberData method data1 data2 interpolationmethod maxperiod pershift performed tablecount;
+            turnon(app,'green ');
+            app.StatusTextArea.Value = vertcat('Analysis started.', app.StatusTextArea.Value);
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'on');
+            app.PerformAnalysisButton.Enable = 'off';
+            app.automaticallyCheckBox.Enable = 'off';
+            app.ZeroLagCoefficientEditField.Value = 0;
+            app.ShiftEditField.Value = 0;
+            app.CoefEditField.Value = 0;
+            app.ShiftEditFieldneg.Value = 0;
+            app.CoefEditFieldneg.Value = 0;
+            app.ValueEditField.FontColor = [0 0 0];
+            app.CoefLabel_3.Visible = 'off';
+            app.OwnShiftEditField.Value = 0;
+            tablecount = 1;
+            
+            resolution = app.ResolutionEditField.Value;
+            binsize = app.BinSizeEditField.Value;
+            maxperiod = app.ValueEditField.Value;
+            
+            global r peaks minimas done data1_new data2_new;
+            clear time1 time2 t1 t2 x1 x2; 
+            
+            if NumberData == 1
+                app.MaximalPositiveLabel.Text = 'Most Prominent';
+                app.CorrelationLabel.Text = 'Period';
+                app.ShowMinimasButton.Value = false;
+                app.ShiftEditFieldneg.Visible = 'off';
+                app.CoefEditFieldneg.Visible = 'off';
+                app.MaximalNegativeLabel.Visible = 'off';
+                app.CorrelationLabel_2.Visible = 'off';
+                app.ShiftEditField_2Label.Text = '';
+                app.CoefLabel_2.Text = '';
+                app.UITable.ColumnName = {'No.' 'Period' 'Coef.'};
+                app.OwnShiftEditField.Position = [85 251 70 22];
+                app.OwnShiftEditFieldLabel.Text = 'Own Period';
+                app.PlotButton.Position = [163 251 100 22];
+                app.CoefLabel_3.Position = [86 232 69 15];
+                app.OwnShiftEditFieldLabel.Position = [8 255 65 15];
+                
+                if method == 1
+                    set(app.UIAxes_3,'Ydir','normal');
+                    time = data1(:,1);
+                    t = time(1):resolution:time(end);
+                    x = (interp1(time,data1(:,2),t,interpolationmethod));
+            
+                    data1_new(:,1) = t;
+                    data1_new(:,2) = x;
+        
+                    numlags = length(data1_new(:,1))-1;
+            
+                    [xcf,lags] = crosscorr(data1_new(:,2),data1_new(:,2),numlags);
+                    lags = (lags*resolution);
+                    r = [];
+                    r(:,1) = lags;
+                    r(:,2) = xcf;
+                                                  
+                elseif method == 3
+                    set(app.UIAxes_3,'Ydir','normal')
+                    data1_new = data1;
+                    sigma = std(data1_new(:,2));
+                    aver = mean(data1_new(:,2));
+                    nbins = ceil(maxperiod/binsize);
+                    udcf = zeros(nbins,3);
+                    for i = 1 : size(data1_new,1)
+                        for j = i : size(data1_new,1)
+                            tdiffer = data1_new(j,1)-data1_new(i,1);
+                            if tdiffer > maxperiod
+                                break
+                            end
+                            if tdiffer == 0
+                                index = 1;
+                            else
+                                index = ceil(tdiffer/binsize);
+                            end
+                            udcf(index,1) = udcf(index,1) + tdiffer;
+                            udcf(index,2) = udcf(index,2) + ((data1_new(i,2)-aver)*(data1_new(j,2)-aver))/sigma^2;
+                            udcf(index,3) = udcf(index,3) + 1;
+                        end
+                    end
+                    r(:,1) = (udcf(:,1)./udcf(:,3));
+                    r(:,2) = (udcf(:,2)./udcf(:,3));
+                    
+                elseif method == 2
+                    set(app.UIAxes_3,'Ydir','reverse')
+                    data1_new = data1;
+                    nbins = ceil(maxperiod/binsize);
+                    self = zeros(nbins,3);
+                    for i = 1 : size(data1_new,1)
+                        for j = i : size(data1_new,1)
+                            tdiffer = data1_new(j,1)-data1_new(i,1);
+                            if tdiffer > maxperiod
+                                break
+                            end
+                            if tdiffer == 0
+                                index = 1;
+                            else
+                                index = ceil(tdiffer/binsize);
+                            end
+                            self(index,1) = self(index,1) + tdiffer;
+                            self(index,2) = self(index,2) + abs(data1_new(i,2)-data1_new(j,2));
+                            self(index,3) = self(index,3) + 1;
+                        end
+                    end
+                    r(:,1) = (self(:,1)./self(:,3));
+                    r(:,2) = (self(:,2)./self(:,3));
+                    
+                end
+            
+                if abs(data1(1,1)-data1(end,1)) < maxperiod
+                    maxperiod = abs(data1(1,1)-data1(end,1));
+                    app.ValueEditField.Value = maxperiod;
+                    app.ValueEditField.FontColor = [1 0 0];
+                    turnon(app,'red   ');
+                end
+        
+                r = r(r(:,1)<=maxperiod  & r(:,1)>=0,:);
+        
+                [pks,locpks] = findpeaks(r(:,2),r(:,1),'SortStr','descend');
+                peaks = [locpks pks];
+                
+                if method == 2
+                    [pks,locpks] = findpeaks(-r(:,2),r(:,1),'SortStr','descend');
+                    peaks = [locpks pks];
+                end
+        
+                [mins,locmins] = findpeaks((-r(:,2)),r(:,1),'SortStr','descend');
+                minimas = [locmins -mins];
+        
+                plot(app.UIAxes_3,r(:,1),r(:,2))
+            
+                xlabel(app.UIAxes_3,'Period')
+                set(app.UIAxes_3,'xlim',[0 maxperiod]);
+        
+                hold(app.UIAxes_3,'on')
+                if method == 2
+                    M = movmedian(r(:,2),app.MedianBoxEditField.Value);
+                    plot(app.UIAxes_3,r(:,1),M)
+                end
+                if method == 3
+                    M = movmedian(r(:,2),app.MedianBoxEditField.Value);
+                    plot(app.UIAxes_3,r(:,1),M)
+                end
+                
+                if isempty(peaks(:,1))
+                    app.ShiftEditField.Visible = 'off';
+                    app.CoefEditField.Visible = 'off';
+                else
+                    pershift = peaks(1,1);
+                    app.ShiftEditField.Value = peaks(1,1);
+                    app.CoefEditField.Value = peaks(1,2);
+                    if app.ShowPeaksButton.Value == true
+                        if app.limittoCheckBox.Value == true
+                            plot(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                            text(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)))'),'color','r')
+                        else
+                            plot(app.UIAxes_3, peaks(:,1),peaks(:,2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                            text(app.UIAxes_3, peaks(:,1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(:,2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(:,2)))'),'color','r')
+                        end
+                    end             
+                    line(app.UIAxes_3,[peaks(1,1) peaks(1,1)],[-100 100],'Color','r','LineStyle', '-')
+                    app.UIAxes_3.YLim = [min(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))) max(r(:,2))+0.1*(max(r(:,2))-min(r(:,2)))];
+            
+                end
+                        
+                hold(app.UIAxes_3,'off')
+                app.ShowMinimasButton.Visible = 'off';
+                app.limittoCheckBox_2.Visible = 'off';
+                app.EditField_2.Visible = 'off';
+        
+                                     
+                yyaxis(app.UIAxes_4,'left')
+                cla(app.UIAxes_4);
+                yyaxis(app.UIAxes_4,'right')
+                cla(app.UIAxes_4);
+                yyaxis(app.UIAxes_4,'left')
+                plot(app.UIAxes_4,data1_new(:,1),data1_new(:,2))
+                hold(app.UIAxes_4,'on')
+                yyaxis(app.UIAxes_4,'right')
+                plot(app.UIAxes_4,data1_new(:,1)+peaks(1,1),data1_new(:,2),'color',[1 .5 0.2])
+                hold(app.UIAxes_4,'off')
+                set(app.UIAxes_4,'xlim',[min(min(data1_new(:,1)),min(data1_new(:,1)+peaks(1,1))) max(max(data1_new(:,1)),max(data1_new(:,1)+peaks(1,1)))]);
+            
+                if app.ReversedYAxisCheckBox.Value == true
+                    yyaxis(app.UIAxes_4,'left')
+                    set(app.UIAxes_4,'Ydir','reverse');
+                    yyaxis(app.UIAxes_4,'right')
+                    set(app.UIAxes_4,'Ydir','reverse'); 
+                else
+                    yyaxis(app.UIAxes_4,'left')
+                    set(app.UIAxes_4,'Ydir','normal');
+                    yyaxis(app.UIAxes_4,'right')
+                    set(app.UIAxes_4,'Ydir','normal'); 
+                end
+                                    
+                temp = [];
+                temp(1:length(peaks(:,1)),1) = 1:length(peaks(:,1));
+                temp(:,2) = round((peaks(:,1)*100))/100;
+                temp(:,3) = round((peaks(:,2)*100))/100;
+                
+                set(findall(app.TableofPeriodsPanel, '-property', 'visible'), 'visible', 'on');
+                set(findall(app.NegativeCorrelationMinimasPanel, '-property', 'visible'), 'visible', 'off');
+                
+                app.UITable.Data = temp;
+                app.TableofPeriodsPanel.Title = 'Table of Periods';
+                app.TableofPeriodsPanel.Position = [12 280 260 142];
+                if temp(end,1) > 4
+                    app.UITable.ColumnWidth = {40 99 80};
+                else
+                    app.UITable.ColumnWidth = {40 99 99};
+                end
+                
+                app.ZeroLagCoefficientEditField.Value = abs(data1(1,1)-data1(end,1));
+                app.ZeroLagCoefficientEditFieldLabel.Text = 'Length of Dataset';
+                done=1;
+    
+                period = peaks(1,1);
+                cla(app.UIAxes_5);
+                phase = zeros(length(data1(:,1)),2);
+                for i = 1:(length(data1(:,1)))
+                    phase(i,1)=(data1(i,1)-data1(1,1)-period*floor((data1(i,1)-data1(1,1))/period))/period;
+                    phase(i,2)=phase(i,1)+1;
+                end
+                
+                scatter(app.UIAxes_5, phase(:,1),data1(:,2),5,'filled');
+                hold(app.UIAxes_5,'on')
+                scatter(app.UIAxes_5, phase(:,2),data1(:,2),5,[0 0.447 0.741],'filled')
+                hold(app.UIAxes_5,'off')
+            
+    
+                if app.ReversedYAxisCheckBox.Value == true
+                        set(app.UIAxes_5,'Ydir','reverse');
+                else
+                        set(app.UIAxes_5,'Ydir','normal'); 
+                end 
+                            
+            elseif NumberData == 2
+                set(findall(app.UIAxes_5, '-property', 'visible'), 'visible', 'off');
+                set(findall(app.TableofPeriodsPanel, '-property', 'visible'), 'visible', 'off');
+                app.ShiftEditField_2Label.Text = 'Shift';
+                app.CoefLabel_2.Text = 'Coef';
+                app.MaximalPositiveLabel.Text = 'Maximal Positive';
+                app.CorrelationLabel.Text = 'Correlation';
+                app.UITable.ColumnName = {'No.' 'Shift' 'Coef.'};
+                app.OwnShiftEditField.Position = [85 34 70 22];
+                app.OwnShiftEditFieldLabel.Text = 'Own Shift';
+                app.PlotButton.Position = [163 34 100 22];
+                app.CoefLabel_3.Position = [86 15 69 15];
+                app.OwnShiftEditFieldLabel.Position = [13 38 57 15];
+                
+                time1 = data1(:,1);
+                time2 = data2(:,1);
+                t1 = time1(1):resolution:time1(end);
+                t2 = time2(1):resolution:time2(end);
+                x1 = (interp1(time1,data1(:,2),t1,interpolationmethod));
+                x2 = (interp1(time2,data2(:,2),t2,interpolationmethod));
+            
+                data1_new(:,1) = t1;
+                data1_new(:,2) = x1;
+                data2_new(:,1) = t2;
+                data2_new(:,2) = x2;
+    
+                tdiff = data1_new(1,1)-data2_new(1,1);
+                    
+                numlags = floor(min(length(data1_new(:,1))-1,length(data2_new(:,1))-1));
+            
+                [xcf,lags] = crosscorr(data2_new(:,2),data1_new(:,2),numlags);
+                lags = (lags*resolution) + tdiff;
+                r = [];
+                r(:,1) = lags;
+                r(:,2) = xcf;
+    
+                zerolag = r(ceil(length(r(:,1))/2-tdiff/resolution),2);
+            
+            %                 app.StatusTextArea.Value = vertcat('Tdiff:',num2str(tdiff),'numlags:',num2str(numlags), app.StatusTextArea.Value);
+           
+                            
+                if min(abs(data1(1,1)-data1(end,1)),abs(data2(1,1)-data2(end,1))) < maxperiod
+                        maxperiod = min(abs(data1(1,1)-data1(end,1)),abs(data2(1,1)-data2(end,1)));
+                        app.ValueEditField.Value = maxperiod;
+                        app.ValueEditField.FontColor = [1 0 0];
+                        turnon(app,'red   ');
+                end
+    
+                r = r(r(:,1) <= maxperiod  & r(:,1) >= -maxperiod,:);
+    
+                [pks,locpks] = findpeaks(r(:,2),r(:,1),'SortStr','descend');
+                peaks=[locpks pks];
+    
+                [mins,locmins] = findpeaks((-r(:,2)),r(:,1),'SortStr','descend');
+                minimas = [locmins -mins];
+    
+                plot(app.UIAxes_3,r(:,1),r(:,2))
+                xlabel(app.UIAxes_3,'Shift')
+                set(app.UIAxes_3,'xlim',[r(1,1) r(end,1)]);
+            
+                hold(app.UIAxes_3,'on')
+                if isempty(peaks(:,1))
+                    app.ShiftEditField.Visible = 'off';
+                    app.CoefEditField.Visible = 'off';
+                else
+                    pershift = peaks(1,1);
+                    app.ShiftEditField.Value = peaks(1,1);
+                    app.CoefEditField.Value = peaks(1,2);
+                    if app.ShowPeaksButton.Value == true
+                        if app.limittoCheckBox.Value == true
+                            plot(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                            text(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)))'),'color','r')
+                        else
+                            plot(app.UIAxes_3, peaks(:,1),peaks(:,2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                            text(app.UIAxes_3, peaks(:,1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(:,2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(:,2)))'),'color','r')
+                        end
+                    end
+                    
+                    line(app.UIAxes_3,[peaks(1,1) peaks(1,1)],[-100 100],'Color','r','LineStyle', '-')
+                    app.UIAxes_3.YLim = [min(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))) max(r(:,2))+0.1*(max(r(:,2))-min(r(:,2)))];
+                
+                end
+                
+        
+                if isempty(minimas(:,1))
+                    app.ShiftEditFieldneg.Visible = 'off';
+                    app.CoefEditFieldneg.Visible = 'off';
+                else
+                    app.ShiftEditFieldneg.Value = minimas(1,1);
+                    app.CoefEditFieldneg.Value = minimas(1,2);
+                    if app.ShowMinimasButton.Value == true
+                        if app.limittoCheckBox_2.Value == true
+                            plot(app.UIAxes_3,minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),1),minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)-0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'b^')
+                            text(app.UIAxes_3,minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)-0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)))'),'color','b')
+                        else
+                            plot(app.UIAxes_3,minimas(:,1),minimas(:,2)-0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'b^')
+                            text(app.UIAxes_3,minimas(:,1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),minimas(:,2)-0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(minimas(:,2)))'),'color','b')
+                        end
+                    end
+                end
+                hold(app.UIAxes_3,'off')
+                           
+                yyaxis(app.UIAxes_4,'left')
+                cla(app.UIAxes_4);
+                yyaxis(app.UIAxes_4,'right')
+                cla(app.UIAxes_4);
+                yyaxis(app.UIAxes_4,'left')
+                plot(app.UIAxes_4,data1(:,1),data1(:,2))
+                hold(app.UIAxes_4,'on')
+                yyaxis(app.UIAxes_4,'right')
+                plot(app.UIAxes_4,data2(:,1)+peaks(1,1),data2(:,2),'color',[1 .5 0.2])
+                hold(app.UIAxes_4,'off')
+                set(app.UIAxes_4,'xlim',[min(min(data1(:,1)),min(data2(:,1)+peaks(1,1))) max(max(data1(:,1)),max(data2(:,1)+peaks(1,1)))]);
+            
+                if app.ReversedYAxisCheckBox.Value == true
+                    yyaxis(app.UIAxes_4,'left')
+                    set(app.UIAxes_4,'Ydir','reverse');                    
+                else
+                    yyaxis(app.UIAxes_4,'left')
+                    set(app.UIAxes_4,'Ydir','normal'); 
+                end
+                
+                if app.ReversedYAxisCheckBox_2.Value == true
+                    yyaxis(app.UIAxes_4,'right')
+                    set(app.UIAxes_4,'Ydir','reverse');                    
+                else
+                    yyaxis(app.UIAxes_4,'right')
+                    set(app.UIAxes_4,'Ydir','normal'); 
+                end
+                
+                temp = [];
+                temp(1:length(peaks(:,1)),1) = 1:length(peaks(:,1));
+                temp(:,2) = round((peaks(:,1)*100))/100;
+                temp(:,3) = round((peaks(:,2)*100))/100;
+                
+                set(findall(app.TableofPeriodsPanel, '-property', 'visible'), 'visible', 'on');
+                app.UITable.Data = temp;
+                app.TableofPeriodsPanel.Title = 'Positive Correlation Peaks';
+                app.TableofPeriodsPanel.Position = [12 220 260 142];
+                if temp(end,1) > 4
+                    app.UITable.ColumnWidth = {40 99 80};
+                else
+                    app.UITable.ColumnWidth = {40 99 99};
+                end
+                
+                temp = [];
+                temp(1:length(minimas(:,1)),1) = 1:length(minimas(:,1));
+                temp(:,2) = round((minimas(:,1)*100))/100;
+                temp(:,3) = round((minimas(:,2)*100))/100;
+                
+                set(findall(app.NegativeCorrelationMinimasPanel, '-property', 'visible'), 'visible', 'on');
+                app.UITable_2.Data = temp;
+                
+                if isempty(temp)
+                else
+                if temp(end,1) > 4
+                    app.UITable_2.ColumnWidth = {40 99 80};
+                else
+                    app.UITable_2.ColumnWidth = {40 99 99};
+                end
+                end
+                    
+                app.ZeroLagCoefficientEditFieldLabel.Text = 'Zero-Lag Coefficient';
+                app.ZeroLagCoefficientEditField.Value = zerolag;
+                done=1;
+                
+    
+            end
+            
+            pause(0.001);
+            turnoff(app);
+            app.StatusTextArea.Value = vertcat('Analysis completed.', app.StatusTextArea.Value);
+            performed = 1;
+            app.PerformAnalysisButton.Enable = 'on';
+            app.automaticallyCheckBox.Enable = 'on';
+            app.SaveResultsButton.Enable = 'on';
+            
+            
+        end
+
+        % Value changed function: EditField, EditField_2, 
+        % ShowMinimasButton, ShowPeaksButton, limittoCheckBox, 
+        % limittoCheckBox_2
+        function showpeaksminimas(app, event)
+            global r peaks minimas method pershift tablecount;
+            plot(app.UIAxes_3,r(:,1),r(:,2))
+            
+            hold(app.UIAxes_3,'on')
+            if method == 2
+                M = movmedian(r(:,2),app.MedianBoxEditField.Value);
+                plot(app.UIAxes_3,r(:,1),M)
+            end
+            if method == 3
+                M = movmedian(r(:,2),app.MedianBoxEditField.Value);
+                plot(app.UIAxes_3,r(:,1),M)
+            end
+            if isempty(peaks(:,1))
+            else
+                if app.ShowPeaksButton.Value == true
+                    if app.limittoCheckBox.Value == true
+                        plot(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                        text(app.UIAxes_3, peaks(1:min(app.EditField.Value,length(peaks(:,1))),1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(1:min(app.EditField.Value,length(peaks(:,1))),2)))'),'color','r')
+                    else
+                        plot(app.UIAxes_3, peaks(:,1),peaks(:,2)+0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'rv')
+                        text(app.UIAxes_3, peaks(:,1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),peaks(:,2)+0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(peaks(:,2)))'),'color','r')
+                    end
+                end
+            end
+            if isempty(minimas(:,1))
+            else
+                if app.ShowMinimasButton.Value == true
+                    if app.limittoCheckBox_2.Value == true
+                        plot(app.UIAxes_3,minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),1),minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)-0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'b^')
+                        text(app.UIAxes_3,minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)-0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(minimas(1:min(app.EditField_2.Value,length(minimas(:,1))),2)))'),'color','b')
+                    else
+                        plot(app.UIAxes_3,minimas(:,1),minimas(:,2)-0.06*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),'b^')
+                        text(app.UIAxes_3,minimas(:,1)+0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),minimas(:,2)-0.09*abs(app.UIAxes_3.YLim(2)-app.UIAxes_3.YLim(1)),num2str((1:numel(minimas(:,2)))'),'color','b')
+                    end
+                end
+            end
+            
+            if tablecount == 1
+                line(app.UIAxes_3,[pershift pershift],[-100 100],'Color','r','LineStyle', '-')
+                app.UIAxes_3.YLim = [min(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))) max(r(:,2))+0.1*(max(r(:,2))-min(r(:,2)))];
+            elseif tablecount == 2
+                line(app.UIAxes_3,[pershift pershift],[-100 100],'Color','b','LineStyle', '-')
+                app.UIAxes_3.YLim = [min(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))) max(r(:,2))+0.1*(max(r(:,2))-min(r(:,2)))];
+            elseif tablecount == 3
+                line(app.UIAxes_3,[pershift pershift],[-100 100],'Color',[0 .5 0],'LineStyle', '-')
+                text(app.UIAxes_3, pershift + 0.03*abs(app.UIAxes_3.XLim(2)-app.UIAxes_3.XLim(1)),max(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))),'OWN','color',[0 .5 0]);
+                app.UIAxes_3.YLim = [min(r(:,2))-0.1*(max(r(:,2))-min(r(:,2))) max(r(:,2))+0.1*(max(r(:,2))-min(r(:,2)))];
+            end
+            
+            hold(app.UIAxes_3,'off')
+        end
+
+        % Button pushed function: FastPeriodAnalysisButton
+        function changetoper1(app, event)
+            global NumberData;
+            NumberData = 1;
+            
+            performanalysis(app);
+            
+            NumberData = 2;
+        end
+
+        % Button pushed function: FastPeriodAnalysisButton_2
+        function changetoper2(app, event)
+            global NumberData data1 data2;
+            
+            data_temp = data1;
+            data1 = data2;
+            NumberData = 1;
+            
+            performanalysis(app);
+            
+            data1 = data_temp;
+            NumberData = 2;
+        end
+
+        % Cell selection callback: UITable
+        function firsttable(app, event)
+            turnon(app,'green ');
+            global peaks data1 data2 NumberData pershift tablecount;
+            clear data1_temp data2_temp
+            cla(app.UIAxes_4);
+            selected_cells = event.Indices(1);
+            pershift = peaks(selected_cells,1);
+            tablecount = 1;
+            
+            data1_temp = data1;
+            
+            if NumberData == 1
+                data2_temp = data1;
+            else
+                data2_temp = data2;
+            end
+            
+            yyaxis(app.UIAxes_4,'left')
+            plot(app.UIAxes_4,data1_temp(:,1),data1_temp(:,2))
+            hold(app.UIAxes_4,'on')
+            yyaxis(app.UIAxes_4,'right')
+            plot(app.UIAxes_4,data2_temp(:,1)+pershift,data2_temp(:,2),'color',[1 .5 0.2])
+            hold(app.UIAxes_4,'off')
+            set(app.UIAxes_4,'xlim',[min(min(data1_temp(:,1)),min(data2_temp(:,1)+pershift)) max(max(data1_temp(:,1)),max(data2_temp(:,1)+pershift))]);
+        
+            if app.ReversedYAxisCheckBox.Value == true
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end
+            
+            if app.ReversedYAxisCheckBox_2.Value == true
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end     
+            
+            if NumberData == 1
+                cla(app.UIAxes_5);
+                phase = zeros(length(data1(:,1)),2);
+                for i = 1:(length(data1(:,1)))
+                    phase(i,1)=(data1(i,1)-data1(1,1)-pershift*floor((data1(i,1)-data1(1,1))/pershift))/pershift;
+                    phase(i,2)=phase(i,1)+1;
+                end
+                
+                scatter(app.UIAxes_5, phase(:,1),data1(:,2),5,'filled');
+                hold(app.UIAxes_5,'on')
+                scatter(app.UIAxes_5, phase(:,2),data1(:,2),5,[0 0.447 0.741],'filled')
+                hold(app.UIAxes_5,'off')
+            
+    
+                if app.ReversedYAxisCheckBox.Value == true
+                        set(app.UIAxes_5,'Ydir','reverse');
+                else
+                        set(app.UIAxes_5,'Ydir','normal'); 
+                end
+            end
+            
+            showpeaksminimas(app);
+            
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Graphs replotted.', app.StatusTextArea.Value);
+            turnoff(app);
+        end
+
+        % Button pushed function: SaveFiguresButton
+        function savefigures(app, event)
+            global r peaks maxperiod minimas NumberData data1 pershift
+            x = linspace(-3.8,3.8);
+            y_cos = cos(x);
+            y_poly = 1 - x.^2./2 + x.^4./24;
+            figure
+            subplot(2,2,3);
+            phase = zeros(length(data1(:,1)),2);
+            for i = 1:(length(data1(:,1)))
+                phase(i,1)=(data1(i,1)-data1(1,1)-pershift*floor((data1(i,1)-data1(1,1))/pershift))/pershift;
+                phase(i,2)=phase(i,1)+1;
+            end
+            
+            scatter(phase(:,1),data1(:,2),5,'filled');
+            hold on
+            scatter(phase(:,2),data1(:,2),5,[0 0.447 0.741],'filled')
+            hold off
+        
+            
+            if app.ReversedYAxisCheckBox.Value == true
+                    set(gca, 'Ydir','reverse');
+            else
+                    set(gca, 'Ydir','normal'); 
+            end
+            title('Phase Diagram')
+            xlabel('Phase')
+            ylabel('Original Unit')
+            box on
+            grid on
+            
+            subplot(2,2,4);
+            plot(x,y_poly,'g');
+            title('Shifted Datasets')
+            xlabel('Original Domain')
+            ylabel('Original Unit')
+            box on 
+            grid on
+            
+            subplot(2,2,[1,2]);
+            plot(r(:,1),r(:,2))
+            xlabel('Period')
+            ylabel('Corr. Coef.')
+    
+            hold on
+            if isempty(peaks(:,1))  
+            else
+                if app.ShowPeaksButton.Value == true
+                    if length(peaks(:,1))>10
+                        plot(peaks(1:10,1),peaks(1:10,2)+0.015,'rv')
+                        text(peaks(1:10,1)+0.05*maxperiod,peaks(1:10,2)+0.025,num2str((1:numel(peaks(1:10,2)))'),'color','r')
+                    else
+                        plot(peaks(:,1),peaks(:,2)+0.015,'rv')
+                        text(peaks(:,1)+0.05*maxperiod,peaks(:,2)+0.025,num2str((1:numel(peaks(:,2)))'),'color','r')
+                    end
+                end
+            end
+            if NumberData == 2
+                if isempty(minimas(:,1))
+                else
+                    if app.ShowMinimasButton.Value == true
+                        if length(minimas(:,1))>10
+                            plot(app.UIAxes_3,minimas(1:10,1),minimas(1:10,2)+0.015,'b^')
+                            text(app.UIAxes_3,minimas(1:10,1)+0.05*maxperiod,minimas(1:10,2)-0.025,num2str((1:numel(minimas(1:10,2)))'),'color','b')
+                        else
+                            plot(app.UIAxes_3,minimas(:,1),minimas(:,2)+0.015,'b^')
+                            text(app.UIAxes_3,minimas(:,1)+0.05*maxperiod,minimas(:,2)-0.025,num2str((1:numel(minimas(:,2)))'),'color','b')
+                        end
+                    end
+                end
+            end
+            hold off
+            
+            title('Corelogram')
+            box on
+            grid on
+            
+            ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0 1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
+            
+            text(0.5, 1,'\bf Chosen Period: XYZ','HorizontalAlignment','center','VerticalAlignment', 'top')
+            
+            
+            %             set(gcf,'PaperPositionMode','auto')
+            %             [filename, path] = uiputfile({'*.png', 'Picture (*.png)'},'Save screenshot as');
+            %             saveas(gcf,fullfile(path,filename),'png')
+        end
+
+        % Cell selection callback: UITable_2
+        function secondtable(app, event)
+            turnon(app,'green ');
+            global minimas data1 data2 pershift tablecount;
+            clear data1_temp data2_temp
+            cla(app.UIAxes_4);
+            selected_cells = event.Indices(1);
+            pershift = minimas(selected_cells,1);
+            tablecount = 2;
+            
+            data1_temp = data1;
+            data2_temp = data2;
+                     
+            yyaxis(app.UIAxes_4,'left')
+            plot(app.UIAxes_4,data1_temp(:,1),data1_temp(:,2))
+            hold(app.UIAxes_4,'on')
+            yyaxis(app.UIAxes_4,'right')
+            plot(app.UIAxes_4,data2_temp(:,1)+pershift,data2_temp(:,2),'color',[1 .5 0.2])
+            hold(app.UIAxes_4,'off')
+            set(app.UIAxes_4,'xlim',[min(min(data1_temp(:,1)),min(data2_temp(:,1)+pershift)) max(max(data1_temp(:,1)),max(data2_temp(:,1)+pershift))]);
+        
+            if app.ReversedYAxisCheckBox.Value == true
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end
+            
+            if app.ReversedYAxisCheckBox_2.Value == true
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end
+            
+            showpeaksminimas(app);
+            
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Graphs replotted.', app.StatusTextArea.Value);
+            turnoff(app);
+        end
+
+        % Callback function: BinSizeEditField, MethodButtonGroup, 
+        % ValueEditField
+        function maxperiodchanged(app, event)
+            turnon(app,'green ');
+            global NumberData performed;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            pause(0.001);
+            if NumberData == 1
+                app.StatusTextArea.Value = vertcat('Maximal period value changed.', app.StatusTextArea.Value);
+            else
+                app.StatusTextArea.Value = vertcat('Maximal shift value changed.', app.StatusTextArea.Value);
+            end
+                       
+            turnoff(app);
+            
+            if performed == 1 && app.automaticallyCheckBox.Value == true
+                performanalysis(app);
+            end
+        end
+
+        % Value changed function: ResolutionEditField
+        function interpolationresolutionchanged(app, event)
+            turnon(app,'green ');
+            global performed;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Interpolation resolution changed.', app.StatusTextArea.Value);        
+            turnoff(app);
+            
+            if performed == 1 && app.automaticallyCheckBox.Value == true
+                performanalysis(app);
+            end
+        end
+
+        % Selection changed function: MethodButtonGroup
+        function interpolationmethodcahanged(app, event)
+            selectedButton = app.MethodButtonGroup.SelectedObject;
+            global interpolationmethod performed;
+            turnon(app,'green ');
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            if selectedButton == app.pchipButton
+                interpolationmethod = 'pchip';
+            elseif selectedButton == app.splineButton
+                interpolationmethod = 'spline';
+            elseif selectedButton == app.linearButton
+                interpolationmethod = 'linear';
+            end
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Interpolation method changed to: ',interpolationmethod, app.StatusTextArea.Value);        
+            turnoff(app);
+            
+            if performed == 1 && app.automaticallyCheckBox.Value == true
+                performanalysis(app);
+            end
+        end
+
+        % Value changed function: BinSizeEditField
+        function binsizechanged(app, event)
+            turnon(app,'green ');
+            global performed;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Bin size changed.', app.StatusTextArea.Value);        
+            turnoff(app);
+            
+            if performed == 1 && app.automaticallyCheckBox.Value == true
+                performanalysis(app);
+            end
+        end
+
+        % Value changed function: MedianBoxEditField
+        function medianboxsizechanged(app, event)
+            turnon(app,'green ');
+            global performed;
+            set(findall(app.ResultsPanel, '-property', 'visible'), 'visible', 'off');
+            yyaxis(app.UIAxes_4,'left')
+            set(findall(app.UIAxes_4, '-property', 'visible'), 'visible', 'off');
+            app.ResultsPanel.Visible = 'on';
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Median Box size changed.', app.StatusTextArea.Value);        
+            turnoff(app);
+            
+            if performed == 1 && app.automaticallyCheckBox.Value == true
+                performanalysis(app);
+            end
+        end
+
+        % Button pushed function: PlotButton
+        function plotown(app, event)
+            turnon(app,'green ');
+            global data1 data2 NumberData pershift tablecount r;
+            clear data1_temp data2_temp
+            cla(app.UIAxes_4);
+            pershift = app.OwnShiftEditField.Value;
+            tablecount = 3;
+            
+            data1_temp = data1;
+            
+            if NumberData == 1
+                data2_temp = data1;
+            else
+                data2_temp = data2;
+            end
+                     
+            yyaxis(app.UIAxes_4,'left')
+            plot(app.UIAxes_4,data1_temp(:,1),data1_temp(:,2))
+            hold(app.UIAxes_4,'on')
+            yyaxis(app.UIAxes_4,'right')
+            plot(app.UIAxes_4,data2_temp(:,1)+pershift,data2_temp(:,2),'color',[1 .5 0.2])
+            hold(app.UIAxes_4,'off')
+            set(app.UIAxes_4,'xlim',[min(min(data1_temp(:,1)),min(data2_temp(:,1)+pershift)) max(max(data1_temp(:,1)),max(data2_temp(:,1)+pershift))]);
+        
+            if app.ReversedYAxisCheckBox.Value == true
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'left')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end
+            
+            if app.ReversedYAxisCheckBox_2.Value == true
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','reverse');                    
+            else
+                yyaxis(app.UIAxes_4,'right')
+                set(app.UIAxes_4,'Ydir','normal'); 
+            end
+            
+            if NumberData == 1
+                cla(app.UIAxes_5);
+                phase = zeros(length(data1(:,1)),2);
+                for i = 1:(length(data1(:,1)))
+                    phase(i,1)=(data1(i,1)-data1(1,1)-pershift*floor((data1(i,1)-data1(1,1))/pershift))/pershift;
+                    phase(i,2)=phase(i,1)+1;
+                end
+                
+                scatter(app.UIAxes_5, phase(:,1),data1(:,2),5,'filled');
+                hold(app.UIAxes_5,'on')
+                scatter(app.UIAxes_5, phase(:,2),data1(:,2),5,[0 0.447 0.741],'filled')
+                hold(app.UIAxes_5,'off')
+            
+    
+                if app.ReversedYAxisCheckBox.Value == true
+                        set(app.UIAxes_5,'Ydir','reverse');
+                else
+                        set(app.UIAxes_5,'Ydir','normal'); 
+                end
+            end
+            
+            showpeaksminimas(app);
+            
+            [idx idx] = min(abs(r(:,1)-pershift));
+            app.CoefLabel_3.Visible = 'on';
+            app.CoefLabel_3.Text = horzcat('Coef: ',num2str(r(idx,2),'%.2f'));
+            
+            pause(0.001);
+            app.StatusTextArea.Value = vertcat('Graphs replotted with own value.', app.StatusTextArea.Value);
+            turnoff(app);
+        end
+
+        % Button pushed function: GButton
+        function openingrapher(app, event)
+            winopen('Plot1.grf')
+        end
+    end
+
+    % App initialization and construction
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create CorrLABv10UIFigure
+            app.CorrLABv10UIFigure = uifigure;
+            app.CorrLABv10UIFigure.Position = [50 50 1400 755];
+            app.CorrLABv10UIFigure.Name = 'CorrLAB v1.0';
+            app.CorrLABv10UIFigure.Resize = 'off';
+            setAutoResize(app, app.CorrLABv10UIFigure, true)
+
+            % Create CorrLABv10Label
+            app.CorrLABv10Label = uilabel(app.CorrLABv10UIFigure);
+            app.CorrLABv10Label.VerticalAlignment = 'center';
+            app.CorrLABv10Label.FontSize = 26;
+            app.CorrLABv10Label.FontWeight = 'bold';
+            app.CorrLABv10Label.Position = [32 709 172 34];
+            app.CorrLABv10Label.Text = 'CorrLAB v1.0';
+
+            % Create AnalysisSettingsPanel
+            app.AnalysisSettingsPanel = uipanel(app.CorrLABv10UIFigure);
+            app.AnalysisSettingsPanel.Title = 'Analysis Settings';
+            app.AnalysisSettingsPanel.FontWeight = 'bold';
+            app.AnalysisSettingsPanel.FontSize = 16;
+            app.AnalysisSettingsPanel.Position = [31 36 270 660];
+
+            % Create AnalysisTypeButtonGroup
+            app.AnalysisTypeButtonGroup = uibuttongroup(app.AnalysisSettingsPanel);
+            app.AnalysisTypeButtonGroup.SelectionChangedFcn = createCallbackFcn(app, @analysistype, true);
+            app.AnalysisTypeButtonGroup.Title = 'Analysis Type';
+            app.AnalysisTypeButtonGroup.FontSize = 14;
+            app.AnalysisTypeButtonGroup.Position = [30 545 211 80];
+
+            % Create CorrelationAnalysisButton
+            app.CorrelationAnalysisButton = uiradiobutton(app.AnalysisTypeButtonGroup);
+            app.CorrelationAnalysisButton.Text = 'Correlation Analysis';
+            app.CorrelationAnalysisButton.Position = [11 31 132 15];
+            app.CorrelationAnalysisButton.Value = true;
+
+            % Create PeriodAnalysisButton
+            app.PeriodAnalysisButton = uiradiobutton(app.AnalysisTypeButtonGroup);
+            app.PeriodAnalysisButton.Text = 'Period Analysis';
+            app.PeriodAnalysisButton.Position = [11 9 107 15];
+
+            % Create CorrelationMethodButtonGroup
+            app.CorrelationMethodButtonGroup = uibuttongroup(app.AnalysisSettingsPanel);
+            app.CorrelationMethodButtonGroup.SelectionChangedFcn = createCallbackFcn(app, @analysismethod, true);
+            app.CorrelationMethodButtonGroup.Title = 'Correlation Method';
+            app.CorrelationMethodButtonGroup.FontSize = 14;
+            app.CorrelationMethodButtonGroup.Position = [30 421 211 106];
+
+            % Create ClassicCorrelationButton
+            app.ClassicCorrelationButton = uiradiobutton(app.CorrelationMethodButtonGroup);
+            app.ClassicCorrelationButton.Text = 'Classic Correlation';
+            app.ClassicCorrelationButton.Position = [11 57 126 15];
+            app.ClassicCorrelationButton.Value = true;
+
+            % Create SelfCorrelationButton
+            app.SelfCorrelationButton = uiradiobutton(app.CorrelationMethodButtonGroup);
+            app.SelfCorrelationButton.Enable = 'off';
+            app.SelfCorrelationButton.Text = 'Self-Correlation';
+            app.SelfCorrelationButton.Position = [11 35 108 15];
+
+            % Create DiscreteCorrelationButton
+            app.DiscreteCorrelationButton = uiradiobutton(app.CorrelationMethodButtonGroup);
+            app.DiscreteCorrelationButton.Enable = 'off';
+            app.DiscreteCorrelationButton.Text = 'Discrete Correlation';
+            app.DiscreteCorrelationButton.Position = [11 13 131 15];
+
+            % Create MaximalShiftValuePanel
+            app.MaximalShiftValuePanel = uipanel(app.AnalysisSettingsPanel);
+            app.MaximalShiftValuePanel.Title = 'Maximal Shift Value';
+            app.MaximalShiftValuePanel.FontSize = 14;
+            app.MaximalShiftValuePanel.Position = [29 343 210 60];
+
+            % Create ValueEditFieldLabel
+            app.ValueEditFieldLabel = uilabel(app.MaximalShiftValuePanel);
+            app.ValueEditFieldLabel.HorizontalAlignment = 'right';
+            app.ValueEditFieldLabel.Position = [35 12 37 15];
+            app.ValueEditFieldLabel.Text = 'Value';
+
+            % Create ValueEditField
+            app.ValueEditField = uieditfield(app.MaximalShiftValuePanel, 'numeric');
+            app.ValueEditField.ValueChangedFcn = createCallbackFcn(app, @maxperiodchanged, true);
+            app.ValueEditField.Limits = [1e-23 Inf];
+            app.ValueEditField.ValueDisplayFormat = '%.2f';
+            app.ValueEditField.Position = [87 8 100 22];
+            app.ValueEditField.Value = 1000;
+
+            % Create InterpolationPanel
+            app.InterpolationPanel = uipanel(app.AnalysisSettingsPanel);
+            app.InterpolationPanel.Title = 'Interpolation';
+            app.InterpolationPanel.FontSize = 14;
+            app.InterpolationPanel.Position = [29 148 210 178];
+
+            % Create ResolutionEditFieldLabel
+            app.ResolutionEditFieldLabel = uilabel(app.InterpolationPanel);
+            app.ResolutionEditFieldLabel.HorizontalAlignment = 'right';
+            app.ResolutionEditFieldLabel.Position = [8 128 64 15];
+            app.ResolutionEditFieldLabel.Text = 'Resolution';
+
+            % Create ResolutionEditField
+            app.ResolutionEditField = uieditfield(app.InterpolationPanel, 'numeric');
+            app.ResolutionEditField.ValueChangedFcn = createCallbackFcn(app, @interpolationresolutionchanged, true);
+            app.ResolutionEditField.Limits = [1e-23 Inf];
+            app.ResolutionEditField.ValueDisplayFormat = '%.2f';
+            app.ResolutionEditField.Position = [87 124 100 22];
+            app.ResolutionEditField.Value = 0.1;
+
+            % Create MethodButtonGroup
+            app.MethodButtonGroup = uibuttongroup(app.InterpolationPanel);
+            app.MethodButtonGroup.SelectionChangedFcn = createCallbackFcn(app, @interpolationmethodcahanged, true);
+            app.MethodButtonGroup.Title = 'Method';
+            app.MethodButtonGroup.Position = [13 8 179 106];
+
+            % Create pchipButton
+            app.pchipButton = uiradiobutton(app.MethodButtonGroup);
+            app.pchipButton.Text = 'pchip';
+            app.pchipButton.Position = [11 60 52 15];
+            app.pchipButton.Value = true;
+
+            % Create splineButton
+            app.splineButton = uiradiobutton(app.MethodButtonGroup);
+            app.splineButton.Text = 'spline';
+            app.splineButton.Position = [11 38 55 15];
+
+            % Create linearButton
+            app.linearButton = uiradiobutton(app.MethodButtonGroup);
+            app.linearButton.Text = 'linear';
+            app.linearButton.Position = [11 16 53 15];
+
+            % Create BinningSettingsPanel
+            app.BinningSettingsPanel = uipanel(app.AnalysisSettingsPanel);
+            app.BinningSettingsPanel.Title = 'Binning Settings';
+            app.BinningSettingsPanel.FontSize = 14;
+            app.BinningSettingsPanel.Position = [29 42 209 89];
+
+            % Create BinSizeEditFieldLabel
+            app.BinSizeEditFieldLabel = uilabel(app.BinningSettingsPanel);
+            app.BinSizeEditFieldLabel.Enable = 'off';
+            app.BinSizeEditFieldLabel.HorizontalAlignment = 'right';
+            app.BinSizeEditFieldLabel.Position = [23 41 50 15];
+            app.BinSizeEditFieldLabel.Text = 'Bin Size';
+
+            % Create BinSizeEditField
+            app.BinSizeEditField = uieditfield(app.BinningSettingsPanel, 'numeric');
+            app.BinSizeEditField.ValueChangedFcn = createCallbackFcn(app, @binsizechanged, true);
+            app.BinSizeEditField.Limits = [1e-23 Inf];
+            app.BinSizeEditField.ValueDisplayFormat = '%.2f';
+            app.BinSizeEditField.Enable = 'off';
+            app.BinSizeEditField.Position = [88 37 100 22];
+            app.BinSizeEditField.Value = 1;
+
+            % Create MedianBoxEditFieldLabel
+            app.MedianBoxEditFieldLabel = uilabel(app.BinningSettingsPanel);
+            app.MedianBoxEditFieldLabel.Enable = 'off';
+            app.MedianBoxEditFieldLabel.HorizontalAlignment = 'right';
+            app.MedianBoxEditFieldLabel.Position = [3 11 70 15];
+            app.MedianBoxEditFieldLabel.Text = 'Median Box';
+
+            % Create MedianBoxEditField
+            app.MedianBoxEditField = uieditfield(app.BinningSettingsPanel, 'numeric');
+            app.MedianBoxEditField.ValueChangedFcn = createCallbackFcn(app, @medianboxsizechanged, true);
+            app.MedianBoxEditField.Limits = [1e-23 Inf];
+            app.MedianBoxEditField.ValueDisplayFormat = '%.2f';
+            app.MedianBoxEditField.Enable = 'off';
+            app.MedianBoxEditField.Position = [88 7 100 22];
+            app.MedianBoxEditField.Value = 100;
+
+            % Create Dataset1Panel
+            app.Dataset1Panel = uipanel(app.CorrLABv10UIFigure);
+            app.Dataset1Panel.Title = 'Dataset 1';
+            app.Dataset1Panel.FontWeight = 'bold';
+            app.Dataset1Panel.FontSize = 16;
+            app.Dataset1Panel.Position = [331 377 450 319];
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.Dataset1Panel);
+            title(app.UIAxes, 'Dataset 1');
+            app.UIAxes.PlotBoxAspectRatio = [1 0.70722433460076 0.70722433460076];
+            app.UIAxes.PlotBoxAspectRatioMode = 'manual';
+            app.UIAxes.Box = 'on';
+            app.UIAxes.XGrid = 'on';
+            app.UIAxes.YGrid = 'on';
+            app.UIAxes.Position = [199 67 238 211];
+
+            % Create LoadButton
+            app.LoadButton = uibutton(app.Dataset1Panel, 'push');
+            app.LoadButton.ButtonPushedFcn = createCallbackFcn(app, @load1, true);
+            app.LoadButton.Position = [45 249 100 22];
+            app.LoadButton.Text = 'Load';
+
+            % Create CropOptionsPanel
+            app.CropOptionsPanel = uipanel(app.Dataset1Panel);
+            app.CropOptionsPanel.Title = 'Crop Options';
+            app.CropOptionsPanel.FontSize = 14;
+            app.CropOptionsPanel.Position = [21 54 151 127];
+
+            % Create MaxEditFieldLabel
+            app.MaxEditFieldLabel = uilabel(app.CropOptionsPanel);
+            app.MaxEditFieldLabel.Enable = 'off';
+            app.MaxEditFieldLabel.HorizontalAlignment = 'right';
+            app.MaxEditFieldLabel.Position = [2 46 28 15];
+            app.MaxEditFieldLabel.Text = 'Max';
+
+            % Create MaxEditField
+            app.MaxEditField = uieditfield(app.CropOptionsPanel, 'numeric');
+            app.MaxEditField.ValueDisplayFormat = '%.2f';
+            app.MaxEditField.Enable = 'off';
+            app.MaxEditField.Position = [45 42 100 22];
+            app.MaxEditField.Value = Inf;
+
+            % Create MinEditFieldLabel
+            app.MinEditFieldLabel = uilabel(app.CropOptionsPanel);
+            app.MinEditFieldLabel.Enable = 'off';
+            app.MinEditFieldLabel.HorizontalAlignment = 'right';
+            app.MinEditFieldLabel.Position = [5 77 25 15];
+            app.MinEditFieldLabel.Text = 'Min';
+
+            % Create MinEditField
+            app.MinEditField = uieditfield(app.CropOptionsPanel, 'numeric');
+            app.MinEditField.ValueDisplayFormat = '%.2f';
+            app.MinEditField.Enable = 'off';
+            app.MinEditField.Position = [45 73 100 22];
+
+            % Create CropButton
+            app.CropButton = uibutton(app.CropOptionsPanel, 'push');
+            app.CropButton.ButtonPushedFcn = createCallbackFcn(app, @crop1, true);
+            app.CropButton.Enable = 'off';
+            app.CropButton.Position = [24 9 100 22];
+            app.CropButton.Text = 'Crop';
+
+            % Create ReversedYAxisCheckBox
+            app.ReversedYAxisCheckBox = uicheckbox(app.Dataset1Panel);
+            app.ReversedYAxisCheckBox.ValueChangedFcn = createCallbackFcn(app, @reverseyaxis1, true);
+            app.ReversedYAxisCheckBox.Enable = 'off';
+            app.ReversedYAxisCheckBox.Text = 'Reversed Y-Axis';
+            app.ReversedYAxisCheckBox.Position = [21 217 113 15];
+            app.ReversedYAxisCheckBox.Value = true;
+
+            % Create FastPeriodAnalysisButton
+            app.FastPeriodAnalysisButton = uibutton(app.Dataset1Panel, 'push');
+            app.FastPeriodAnalysisButton.ButtonPushedFcn = createCallbackFcn(app, @changetoper1, true);
+            app.FastPeriodAnalysisButton.Enable = 'off';
+            app.FastPeriodAnalysisButton.Visible = 'off';
+            app.FastPeriodAnalysisButton.Position = [255 39 126 22];
+            app.FastPeriodAnalysisButton.Text = 'Fast Period Analysis';
+
+            % Create GButton
+            app.GButton = uibutton(app.Dataset1Panel, 'push');
+            app.GButton.ButtonPushedFcn = createCallbackFcn(app, @openingrapher, true);
+            app.GButton.FontSize = 14;
+            app.GButton.FontWeight = 'bold';
+            app.GButton.Position = [397 223 30 30];
+            app.GButton.Text = 'G';
+
+            % Create Dataset2Panel
+            app.Dataset2Panel = uipanel(app.CorrLABv10UIFigure);
+            app.Dataset2Panel.Title = 'Dataset 2';
+            app.Dataset2Panel.FontWeight = 'bold';
+            app.Dataset2Panel.FontSize = 16;
+            app.Dataset2Panel.Position = [331 36 450 314];
+
+            % Create UIAxes_2
+            app.UIAxes_2 = uiaxes(app.Dataset2Panel);
+            title(app.UIAxes_2, 'Dataset 2');
+            app.UIAxes_2.PlotBoxAspectRatio = [1 0.70722433460076 0.70722433460076];
+            app.UIAxes_2.PlotBoxAspectRatioMode = 'manual';
+            app.UIAxes_2.Box = 'on';
+            app.UIAxes_2.XGrid = 'on';
+            app.UIAxes_2.YGrid = 'on';
+            app.UIAxes_2.Position = [199 62 238 211];
+
+            % Create LoadButton_2
+            app.LoadButton_2 = uibutton(app.Dataset2Panel, 'push');
+            app.LoadButton_2.ButtonPushedFcn = createCallbackFcn(app, @load2, true);
+            app.LoadButton_2.Enable = 'off';
+            app.LoadButton_2.Position = [45 244 100 22];
+            app.LoadButton_2.Text = 'Load';
+
+            % Create CropOptionsPanel_2
+            app.CropOptionsPanel_2 = uipanel(app.Dataset2Panel);
+            app.CropOptionsPanel_2.Title = 'Crop Options';
+            app.CropOptionsPanel_2.FontSize = 14;
+            app.CropOptionsPanel_2.Position = [21 49 151 144];
+
+            % Create MaxEditField_2Label
+            app.MaxEditField_2Label = uilabel(app.CropOptionsPanel_2);
+            app.MaxEditField_2Label.Enable = 'off';
+            app.MaxEditField_2Label.HorizontalAlignment = 'right';
+            app.MaxEditField_2Label.Position = [2 45 28 15];
+            app.MaxEditField_2Label.Text = 'Max';
+
+            % Create MaxEditField_2
+            app.MaxEditField_2 = uieditfield(app.CropOptionsPanel_2, 'numeric');
+            app.MaxEditField_2.ValueDisplayFormat = '%.2f';
+            app.MaxEditField_2.Enable = 'off';
+            app.MaxEditField_2.Position = [45 41 100 22];
+            app.MaxEditField_2.Value = Inf;
+
+            % Create MinEditField_2Label
+            app.MinEditField_2Label = uilabel(app.CropOptionsPanel_2);
+            app.MinEditField_2Label.Enable = 'off';
+            app.MinEditField_2Label.HorizontalAlignment = 'right';
+            app.MinEditField_2Label.Position = [5 76 25 15];
+            app.MinEditField_2Label.Text = 'Min';
+
+            % Create MinEditField_2
+            app.MinEditField_2 = uieditfield(app.CropOptionsPanel_2, 'numeric');
+            app.MinEditField_2.ValueDisplayFormat = '%.2f';
+            app.MinEditField_2.Enable = 'off';
+            app.MinEditField_2.Position = [45 72 100 22];
+
+            % Create CropButton_2
+            app.CropButton_2 = uibutton(app.CropOptionsPanel_2, 'push');
+            app.CropButton_2.ButtonPushedFcn = createCallbackFcn(app, @crop2, true);
+            app.CropButton_2.Enable = 'off';
+            app.CropButton_2.Position = [24 8 100 22];
+            app.CropButton_2.Text = 'Crop';
+
+            % Create SameLimitsCheckBox
+            app.SameLimitsCheckBox = uicheckbox(app.CropOptionsPanel_2);
+            app.SameLimitsCheckBox.ValueChangedFcn = createCallbackFcn(app, @samelimits, true);
+            app.SameLimitsCheckBox.Enable = 'off';
+            app.SameLimitsCheckBox.Text = 'Same Limits';
+            app.SameLimitsCheckBox.Position = [5 101 89 15];
+
+            % Create ReversedYAxisCheckBox_2
+            app.ReversedYAxisCheckBox_2 = uicheckbox(app.Dataset2Panel);
+            app.ReversedYAxisCheckBox_2.ValueChangedFcn = createCallbackFcn(app, @reverseyaxis2, true);
+            app.ReversedYAxisCheckBox_2.Enable = 'off';
+            app.ReversedYAxisCheckBox_2.Text = 'Reversed Y-Axis';
+            app.ReversedYAxisCheckBox_2.Position = [21 212 113 15];
+            app.ReversedYAxisCheckBox_2.Value = true;
+
+            % Create FastPeriodAnalysisButton_2
+            app.FastPeriodAnalysisButton_2 = uibutton(app.Dataset2Panel, 'push');
+            app.FastPeriodAnalysisButton_2.ButtonPushedFcn = createCallbackFcn(app, @changetoper2, true);
+            app.FastPeriodAnalysisButton_2.Enable = 'off';
+            app.FastPeriodAnalysisButton_2.Visible = 'off';
+            app.FastPeriodAnalysisButton_2.Position = [254 35 126 22];
+            app.FastPeriodAnalysisButton_2.Text = 'Fast Period Analysis';
+
+            % Create ResultsPanel
+            app.ResultsPanel = uipanel(app.CorrLABv10UIFigure);
+            app.ResultsPanel.Title = 'Results';
+            app.ResultsPanel.FontWeight = 'bold';
+            app.ResultsPanel.FontSize = 16;
+            app.ResultsPanel.Position = [811 36 553 570];
+
+            % Create UIAxes_3
+            app.UIAxes_3 = uiaxes(app.ResultsPanel);
+            title(app.UIAxes_3, 'Corelogram');
+            xlabel(app.UIAxes_3, 'Period / Shift');
+            ylabel(app.UIAxes_3, 'Correlation Coefficient');
+            app.UIAxes_3.PlotBoxAspectRatio = [1 0.709433962264151 0.709433962264151];
+            app.UIAxes_3.PlotBoxAspectRatioMode = 'manual';
+            app.UIAxes_3.Box = 'on';
+            app.UIAxes_3.XGrid = 'on';
+            app.UIAxes_3.YGrid = 'on';
+            app.UIAxes_3.Position = [283 333 260 211];
+
+            % Create UIAxes_4
+            app.UIAxes_4 = uiaxes(app.ResultsPanel);
+            title(app.UIAxes_4, 'Shifted Datasets');
+            xlabel(app.UIAxes_4, 'Original Domain');
+            ylabel(app.UIAxes_4, 'Original Unit');
+            app.UIAxes_4.DataAspectRatio = [1 1.40957446808511 1.40957446808511];
+            app.UIAxes_4.DataAspectRatioMode = 'manual';
+            app.UIAxes_4.PlotBoxAspectRatio = [1 0.709433962264151 0.709433962264151];
+            app.UIAxes_4.PlotBoxAspectRatioMode = 'manual';
+            app.UIAxes_4.Box = 'on';
+            app.UIAxes_4.XGrid = 'on';
+            app.UIAxes_4.YGrid = 'on';
+            app.UIAxes_4.Position = [283 13 260 211];
+
+            % Create UIAxes_5
+            app.UIAxes_5 = uiaxes(app.ResultsPanel);
+            title(app.UIAxes_5, 'Phase Diagram');
+            xlabel(app.UIAxes_5, 'Phase');
+            ylabel(app.UIAxes_5, 'Original Unit');
+            app.UIAxes_5.PlotBoxAspectRatio = [1 0.709433962264151 0.709433962264151];
+            app.UIAxes_5.PlotBoxAspectRatioMode = 'manual';
+            app.UIAxes_5.Box = 'on';
+            app.UIAxes_5.XGrid = 'on';
+            app.UIAxes_5.YGrid = 'on';
+            app.UIAxes_5.Position = [14 13 260 211];
+
+            % Create ZeroLagCoefficientEditFieldLabel
+            app.ZeroLagCoefficientEditFieldLabel = uilabel(app.ResultsPanel);
+            app.ZeroLagCoefficientEditFieldLabel.FontWeight = 'bold';
+            app.ZeroLagCoefficientEditFieldLabel.Position = [18 504 121 15];
+            app.ZeroLagCoefficientEditFieldLabel.Text = 'Zero-Lag Coefficient';
+
+            % Create ZeroLagCoefficientEditField
+            app.ZeroLagCoefficientEditField = uieditfield(app.ResultsPanel, 'numeric');
+            app.ZeroLagCoefficientEditField.ValueDisplayFormat = '%.2f';
+            app.ZeroLagCoefficientEditField.Editable = 'off';
+            app.ZeroLagCoefficientEditField.Position = [172 500 70 22];
+
+            % Create ShowPeaksButton
+            app.ShowPeaksButton = uibutton(app.ResultsPanel, 'state');
+            app.ShowPeaksButton.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.ShowPeaksButton.Text = 'Show Peaks';
+            app.ShowPeaksButton.Position = [326 303 100 22];
+            app.ShowPeaksButton.Value = true;
+
+            % Create ShowMinimasButton
+            app.ShowMinimasButton = uibutton(app.ResultsPanel, 'state');
+            app.ShowMinimasButton.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.ShowMinimasButton.Text = 'Show Minimas';
+            app.ShowMinimasButton.Position = [435 303 100 22];
+
+            % Create ShiftEditFieldLabel
+            app.ShiftEditFieldLabel = uilabel(app.ResultsPanel);
+            app.ShiftEditFieldLabel.HorizontalAlignment = 'right';
+            app.ShiftEditFieldLabel.Position = [132 475 29 15];
+            app.ShiftEditFieldLabel.Text = 'Shift';
+
+            % Create ShiftEditField
+            app.ShiftEditField = uieditfield(app.ResultsPanel, 'numeric');
+            app.ShiftEditField.ValueDisplayFormat = '%.2f';
+            app.ShiftEditField.Editable = 'off';
+            app.ShiftEditField.Position = [172 471 70 22];
+
+            % Create CoefLabel
+            app.CoefLabel = uilabel(app.ResultsPanel);
+            app.CoefLabel.HorizontalAlignment = 'right';
+            app.CoefLabel.Position = [130 446 31 15];
+            app.CoefLabel.Text = 'Coef';
+
+            % Create CoefEditField
+            app.CoefEditField = uieditfield(app.ResultsPanel, 'numeric');
+            app.CoefEditField.ValueDisplayFormat = '%.2f';
+            app.CoefEditField.Editable = 'off';
+            app.CoefEditField.Position = [172 442 70 22];
+
+            % Create ShiftEditField_2Label
+            app.ShiftEditField_2Label = uilabel(app.ResultsPanel);
+            app.ShiftEditField_2Label.HorizontalAlignment = 'right';
+            app.ShiftEditField_2Label.Position = [132 417 29 15];
+            app.ShiftEditField_2Label.Text = 'Shift';
+
+            % Create ShiftEditFieldneg
+            app.ShiftEditFieldneg = uieditfield(app.ResultsPanel, 'numeric');
+            app.ShiftEditFieldneg.ValueDisplayFormat = '%.2f';
+            app.ShiftEditFieldneg.Editable = 'off';
+            app.ShiftEditFieldneg.Position = [172 413 70 22];
+
+            % Create CoefLabel_2
+            app.CoefLabel_2 = uilabel(app.ResultsPanel);
+            app.CoefLabel_2.HorizontalAlignment = 'right';
+            app.CoefLabel_2.Position = [130 388 31 15];
+            app.CoefLabel_2.Text = 'Coef';
+
+            % Create CoefEditFieldneg
+            app.CoefEditFieldneg = uieditfield(app.ResultsPanel, 'numeric');
+            app.CoefEditFieldneg.ValueDisplayFormat = '%.2f';
+            app.CoefEditFieldneg.Editable = 'off';
+            app.CoefEditFieldneg.Position = [172 384 70 22];
+
+            % Create MaximalPositiveLabel
+            app.MaximalPositiveLabel = uilabel(app.ResultsPanel);
+            app.MaximalPositiveLabel.FontWeight = 'bold';
+            app.MaximalPositiveLabel.Position = [18 472 102 15];
+            app.MaximalPositiveLabel.Text = 'Maximal Positive';
+
+            % Create MaximalNegativeLabel
+            app.MaximalNegativeLabel = uilabel(app.ResultsPanel);
+            app.MaximalNegativeLabel.FontWeight = 'bold';
+            app.MaximalNegativeLabel.Position = [18 415 107 15];
+            app.MaximalNegativeLabel.Text = 'Maximal Negative';
+
+            % Create CorrelationLabel
+            app.CorrelationLabel = uilabel(app.ResultsPanel);
+            app.CorrelationLabel.FontWeight = 'bold';
+            app.CorrelationLabel.Position = [18 459 69 15];
+            app.CorrelationLabel.Text = 'Correlation';
+
+            % Create CorrelationLabel_2
+            app.CorrelationLabel_2 = uilabel(app.ResultsPanel);
+            app.CorrelationLabel_2.FontWeight = 'bold';
+            app.CorrelationLabel_2.Position = [18 401 69 15];
+            app.CorrelationLabel_2.Text = 'Correlation';
+
+            % Create TableofPeriodsPanel
+            app.TableofPeriodsPanel = uipanel(app.ResultsPanel);
+            app.TableofPeriodsPanel.BorderType = 'none';
+            app.TableofPeriodsPanel.Title = 'Table of Periods';
+            app.TableofPeriodsPanel.FontWeight = 'bold';
+            app.TableofPeriodsPanel.Position = [12 228 260 142];
+
+            % Create UITable
+            app.UITable = uitable(app.TableofPeriodsPanel);
+            app.UITable.ColumnName = {'No.'; 'Period'; 'Coef.'};
+            app.UITable.ColumnWidth = {40, 99, 75};
+            app.UITable.RowName = {};
+            app.UITable.Position = [10 6.79998779296875 240 108];
+            app.UITable.CellSelectionCallback = createCallbackFcn(app, @firsttable, true);
+
+            % Create NegativeCorrelationMinimasPanel
+            app.NegativeCorrelationMinimasPanel = uipanel(app.ResultsPanel);
+            app.NegativeCorrelationMinimasPanel.BorderType = 'none';
+            app.NegativeCorrelationMinimasPanel.Title = 'Negative Correlation Minimas';
+            app.NegativeCorrelationMinimasPanel.FontWeight = 'bold';
+            app.NegativeCorrelationMinimasPanel.Position = [14 67 260 142];
+
+            % Create UITable_2
+            app.UITable_2 = uitable(app.NegativeCorrelationMinimasPanel);
+            app.UITable_2.ColumnName = {'No.'; 'Shift'; 'Coef.'};
+            app.UITable_2.ColumnWidth = {40, 99, 75};
+            app.UITable_2.RowName = {};
+            app.UITable_2.Position = [10 6.79998779296875 240 108];
+            app.UITable_2.CellSelectionCallback = createCallbackFcn(app, @secondtable, true);
+
+            % Create limittoCheckBox
+            app.limittoCheckBox = uicheckbox(app.ResultsPanel);
+            app.limittoCheckBox.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.limittoCheckBox.Text = 'limit to';
+            app.limittoCheckBox.Position = [332 278 57 15];
+            app.limittoCheckBox.Value = true;
+
+            % Create EditField
+            app.EditField = uieditfield(app.ResultsPanel, 'numeric');
+            app.EditField.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.EditField.Limits = [1 Inf];
+            app.EditField.ValueDisplayFormat = '%.0f';
+            app.EditField.Position = [388 274 29 22];
+            app.EditField.Value = 10;
+
+            % Create limittoCheckBox_2
+            app.limittoCheckBox_2 = uicheckbox(app.ResultsPanel);
+            app.limittoCheckBox_2.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.limittoCheckBox_2.Text = 'limit to';
+            app.limittoCheckBox_2.Position = [443 278 57 15];
+            app.limittoCheckBox_2.Value = true;
+
+            % Create EditField_2
+            app.EditField_2 = uieditfield(app.ResultsPanel, 'numeric');
+            app.EditField_2.ValueChangedFcn = createCallbackFcn(app, @showpeaksminimas, true);
+            app.EditField_2.Limits = [1 Inf];
+            app.EditField_2.ValueDisplayFormat = '%.0f';
+            app.EditField_2.Position = [499 274 29 22];
+            app.EditField_2.Value = 10;
+
+            % Create OwnShiftEditFieldLabel
+            app.OwnShiftEditFieldLabel = uilabel(app.ResultsPanel);
+            app.OwnShiftEditFieldLabel.HorizontalAlignment = 'right';
+            app.OwnShiftEditFieldLabel.Position = [13 38 57 15];
+            app.OwnShiftEditFieldLabel.Text = 'Own Shift';
+
+            % Create OwnShiftEditField
+            app.OwnShiftEditField = uieditfield(app.ResultsPanel, 'numeric');
+            app.OwnShiftEditField.Position = [85 34 70 22];
+
+            % Create CoefLabel_3
+            app.CoefLabel_3 = uilabel(app.ResultsPanel);
+            app.CoefLabel_3.Visible = 'off';
+            app.CoefLabel_3.Position = [86 15 69 15];
+            app.CoefLabel_3.Text = 'Coef:';
+
+            % Create PlotButton
+            app.PlotButton = uibutton(app.ResultsPanel, 'push');
+            app.PlotButton.ButtonPushedFcn = createCallbackFcn(app, @plotown, true);
+            app.PlotButton.Position = [163 34 100 22];
+            app.PlotButton.Text = 'Plot';
+
+            % Create StatusTextAreaLabel
+            app.StatusTextAreaLabel = uilabel(app.CorrLABv10UIFigure);
+            app.StatusTextAreaLabel.HorizontalAlignment = 'right';
+            app.StatusTextAreaLabel.Position = [811 677 39 15];
+            app.StatusTextAreaLabel.Text = 'Status';
+
+            % Create StatusTextArea
+            app.StatusTextArea = uitextarea(app.CorrLABv10UIFigure);
+            app.StatusTextArea.Editable = 'off';
+            app.StatusTextArea.FontName = 'Courier';
+            app.StatusTextArea.Position = [861 634 168 60];
+
+            % Create PerformAnalysisButton
+            app.PerformAnalysisButton = uibutton(app.CorrLABv10UIFigure, 'push');
+            app.PerformAnalysisButton.ButtonPushedFcn = createCallbackFcn(app, @performanalysis, true);
+            app.PerformAnalysisButton.Enable = 'off';
+            app.PerformAnalysisButton.Position = [1064.5 634 107 60];
+            app.PerformAnalysisButton.Text = 'Perform Analysis';
+
+            % Create SaveResultsButton
+            app.SaveResultsButton = uibutton(app.CorrLABv10UIFigure, 'push');
+            app.SaveResultsButton.ButtonPushedFcn = createCallbackFcn(app, @saveresults, true);
+            app.SaveResultsButton.Enable = 'off';
+            app.SaveResultsButton.Position = [1185 668 100 26];
+            app.SaveResultsButton.Text = 'Save Results';
+
+            % Create SaveFiguresButton
+            app.SaveFiguresButton = uibutton(app.CorrLABv10UIFigure, 'push');
+            app.SaveFiguresButton.ButtonPushedFcn = createCallbackFcn(app, @savefigures, true);
+            app.SaveFiguresButton.Enable = 'off';
+            app.SaveFiguresButton.Position = [1185 634 100 26];
+            app.SaveFiguresButton.Text = 'Save Figures';
+
+            % Create RestartButton
+            app.RestartButton = uibutton(app.CorrLABv10UIFigure, 'push');
+            app.RestartButton.ButtonPushedFcn = createCallbackFcn(app, @restart, true);
+            app.RestartButton.BackgroundColor = [1 0.8784 0.8784];
+            app.RestartButton.Position = [1299.5 634 64 60];
+            app.RestartButton.Text = 'Restart';
+
+            % Create Lamp
+            app.Lamp = uilamp(app.CorrLABv10UIFigure);
+            app.Lamp.Enable = 'off';
+            app.Lamp.Position = [823 648 20 20];
+            app.Lamp.Color = [1 1 1];
+
+            % Create Copyright2017JaroslavMercAllRightsReservedLabel
+            app.Copyright2017JaroslavMercAllRightsReservedLabel = uilabel(app.CorrLABv10UIFigure);
+            app.Copyright2017JaroslavMercAllRightsReservedLabel.FontColor = [0.5216 0.4902 0.4902];
+            app.Copyright2017JaroslavMercAllRightsReservedLabel.Position = [31 10 301 15];
+            app.Copyright2017JaroslavMercAllRightsReservedLabel.Text = 'Copyright © 2017 Jaroslav Merc. All Rights Reserved.';
+
+            % Create automaticallyCheckBox
+            app.automaticallyCheckBox = uicheckbox(app.CorrLABv10UIFigure);
+            app.automaticallyCheckBox.Enable = 'off';
+            app.automaticallyCheckBox.Text = 'automatically';
+            app.automaticallyCheckBox.Position = [1065 614 94 15];
+            app.automaticallyCheckBox.Value = true;
+
+            % Create Version10April2017Label
+            app.Version10April2017Label = uilabel(app.CorrLABv10UIFigure);
+            app.Version10April2017Label.HorizontalAlignment = 'right';
+            app.Version10April2017Label.FontColor = [0.5216 0.4902 0.4902];
+            app.Version10April2017Label.Position = [1232 10 134 15];
+            app.Version10April2017Label.Text = 'Version 1.0 (April 2017)';
+
+            % Create Button_2
+            app.Button_2 = uibutton(app.CorrLABv10UIFigure, 'push');
+            app.Button_2.Visible = 'off';
+            app.Button_2.Icon = 'corrlab_logo_smaller.jpg';
+            app.Button_2.BackgroundColor = [1 1 1];
+            app.Button_2.Position = [31 672 270 79];
+            app.Button_2.Text = '';
+        end
+    end
+
+    methods (Access = public)
+
+        % Construct app
+        function app = corrlab()
+
+            % Create and configure components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.CorrLABv10UIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startfunc)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.CorrLABv10UIFigure)
+        end
+    end
+end
