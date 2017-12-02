@@ -90,9 +90,9 @@ classdef corrlab < matlab.apps.AppBase
         SaveFiguresButton             matlab.ui.control.Button
         RestartButton                 matlab.ui.control.Button
         Lamp                          matlab.ui.control.Lamp
-        Copyright2017JaroslavMercAllRightsReservedLabel  matlab.ui.control.Label
+        byJaroslavMercLabel           matlab.ui.control.Label
         automaticallyCheckBox         matlab.ui.control.CheckBox
-        Version10April2017Label       matlab.ui.control.Label
+        Version10December2017Label    matlab.ui.control.Label
         Button_2                      matlab.ui.control.Button
     end
 
@@ -2063,11 +2063,11 @@ classdef corrlab < matlab.apps.AppBase
             app.Lamp.Position = [823 648 20 20];
             app.Lamp.Color = [1 1 1];
 
-            % Create Copyright2017JaroslavMercAllRightsReservedLabel
-            app.Copyright2017JaroslavMercAllRightsReservedLabel = uilabel(app.CorrLABv10UIFigure);
-            app.Copyright2017JaroslavMercAllRightsReservedLabel.FontColor = [0.5216 0.4902 0.4902];
-            app.Copyright2017JaroslavMercAllRightsReservedLabel.Position = [31 10 301 15];
-            app.Copyright2017JaroslavMercAllRightsReservedLabel.Text = 'Copyright © 2017 Jaroslav Merc. All Rights Reserved.';
+            % Create byJaroslavMercLabel
+            app.byJaroslavMercLabel = uilabel(app.CorrLABv10UIFigure);
+            app.byJaroslavMercLabel.FontColor = [0.5216 0.4902 0.4902];
+            app.byJaroslavMercLabel.Position = [31 10 131 15];
+            app.byJaroslavMercLabel.Text = '2017 by Jaroslav Merc.';
 
             % Create automaticallyCheckBox
             app.automaticallyCheckBox = uicheckbox(app.CorrLABv10UIFigure);
@@ -2076,12 +2076,12 @@ classdef corrlab < matlab.apps.AppBase
             app.automaticallyCheckBox.Position = [1065 614 94 15];
             app.automaticallyCheckBox.Value = true;
 
-            % Create Version10April2017Label
-            app.Version10April2017Label = uilabel(app.CorrLABv10UIFigure);
-            app.Version10April2017Label.HorizontalAlignment = 'right';
-            app.Version10April2017Label.FontColor = [0.5216 0.4902 0.4902];
-            app.Version10April2017Label.Position = [1232 10 134 15];
-            app.Version10April2017Label.Text = 'Version 1.0 (April 2017)';
+            % Create Version10December2017Label
+            app.Version10December2017Label = uilabel(app.CorrLABv10UIFigure);
+            app.Version10December2017Label.HorizontalAlignment = 'right';
+            app.Version10December2017Label.FontColor = [0.5216 0.4902 0.4902];
+            app.Version10December2017Label.Position = [1200 10 166 15];
+            app.Version10December2017Label.Text = 'Version 1.0 (December 2017)';
 
             % Create Button_2
             app.Button_2 = uibutton(app.CorrLABv10UIFigure, 'push');
