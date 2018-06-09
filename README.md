@@ -8,6 +8,6 @@ Welcome to GitHub repository of CorrLAB software.
 
 
 
-You can download the software and its code here. Use the Wiki page for more information on the software, its installation and instructions for using the application.
+You can download the software and its code here. Use the [Wiki page](https://github.com/jaroslavmerc/corrlab/wiki) for more information on the software, its installation and instructions for using the application.
 
-Please, report bugs using the tab Issues of this repository.
+Please, report bugs using the [Issues page](https://github.com/jaroslavmerc/corrlab/issues) of this repository.
